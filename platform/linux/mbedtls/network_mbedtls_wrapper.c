@@ -74,7 +74,7 @@ void _iot_tls_set_connect_params(Network *pNetwork, char *pRootCALocation, char 
 	pNetwork->tlsConnectParams.ServerVerificationFlag = ServerVerificationFlag;
 }
 
-IoT_Error_t iot_tls_init(Network *pNetwork, char *pRootCALocation, char *pDeviceCertLocation,
+IoT_Error_t iot_tls_init_jordan(Network *pNetwork, char *pRootCALocation, char *pDeviceCertLocation,
 						 char *pDevicePrivateKeyLocation, char *pDestinationURL,
 						 uint16_t destinationPort, uint32_t timeout_ms, bool ServerVerificationFlag) {
 	_iot_tls_set_connect_params(pNetwork, pRootCALocation, pDeviceCertLocation, pDevicePrivateKeyLocation,

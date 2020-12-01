@@ -41,7 +41,7 @@ extern "C" {
 #endif
 
 #include "aws_iot_mqtt_client_common_internal.h"
-
+#include "aws_iot_log.h"
 /**
  * @param stringVar pointer to the String into which the data is to be read
  * @param stringLen pointer to variable which has the length of the string

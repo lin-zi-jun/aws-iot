@@ -40,7 +40,7 @@ extern "C" {
 #endif
 
 #include "aws_iot_mqtt_client_common_internal.h"
-
+#include "aws_iot_log.h"
 /**
   * Serializes the supplied unsubscribe data into the supplied buffer, ready for sending
   * @param pTxBuf the raw buffer data, of the correct length determined by the remaining length field

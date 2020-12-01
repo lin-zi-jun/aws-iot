@@ -40,7 +40,7 @@ extern "C" {
 #endif
 
 #include "aws_iot_mqtt_client_common_internal.h"
-
+#include "aws_iot_log.h"
 /**
   * Serializes the supplied subscribe data into the supplied buffer, ready for sending
   * @param pTxBuf the buffer into which the packet will be serialized

@@ -40,7 +40,7 @@ extern "C" {
 #endif
 
 #include "aws_iot_mqtt_client_common_internal.h"
-
+#include "aws_iot_log.h"
 /**
   * This is for the case when the aws_iot_mqtt_internal_send_packet Fails.
   */

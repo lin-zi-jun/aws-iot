@@ -44,7 +44,7 @@ extern "C" {
 #include <aws_iot_mqtt_client.h>
 #include "aws_iot_mqtt_client_interface.h"
 #include "aws_iot_mqtt_client_common_internal.h"
-
+#include "aws_iot_log.h"
 /** connect flags byte */
 typedef union {
 	uint8_t all;    /**< all connect flags */
