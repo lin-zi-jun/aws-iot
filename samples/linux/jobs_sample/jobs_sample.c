@@ -62,24 +62,37 @@ static jsmn_parser jsonParser;
 static jsmntok_t jsonTokenStruct[MAX_JSON_TOKEN_EXPECTED];
 static int32_t tokenCount;
 
-static void iot_get_pending_callback_handler(AWS_IoT_Client *pClient, char *topicName, uint16_t topicNameLen,
-									IoT_Publish_Message_Params *params, void *pData) {
+
+
+
+/*标准回调
+	5个参数
+ */
+static void iot_get_pending_callback_handler(AWS_IoT_Client *pClient, 					//操作句柄	
+														char *topicName,				//触发的主题
+														 uint16_t topicNameLen,			//主题长度
+											IoT_Publish_Message_Params *params,			//传入的负载信息
+														 void *pData) {					//用户数据
 	IOT_UNUSED(pData);
 	IOT_UNUSED(pClient);
-	IOT_INFO("\nJOB_GET_PENDING_TOPIC callback");
+	IOT_INFO("\n------------start-1-------------");
 	IOT_INFO("topic: %.*s", topicNameLen, topicName);
 	IOT_INFO("payload: %.*s", (int) params->payloadLen, (char *)params->payload);
 
+	//初始化json 解析器
 	jsmn_init(&jsonParser);
 
+	//将负载内容解析之解析器
 	tokenCount = jsmn_parse(&jsonParser, params->payload, (int) params->payloadLen, jsonTokenStruct, MAX_JSON_TOKEN_EXPECTED);
+
+
 
 	if(tokenCount < 0) {
 		IOT_WARN("Failed to parse JSON: %d", tokenCount);
 		return;
 	}
 
-	/* Assume the top-level element is an object */
+	/* Assume the top-level element is an object  判断顶层元素是否是一个对象 */
 	if(tokenCount < 1 || jsonTokenStruct[0].type != JSMN_OBJECT) {
 		IOT_WARN("Top Level is not an object");
 		return;
@@ -87,19 +100,25 @@ static void iot_get_pending_callback_handler(AWS_IoT_Client *pClient, char *topi
 
 	jsmntok_t *jobs;
 
+
+	//查找在工作中的作业
 	jobs = findToken("inProgressJobs", params->payload, jsonTokenStruct);
 
 	if (jobs) {
 		IOT_INFO("inProgressJobs: %.*s", jobs->end - jobs->start, (char *)params->payload + jobs->start);
 	}
 
+	//查找队列中的作业
 	jobs = findToken("queuedJobs", params->payload, jsonTokenStruct);
 
 	if (jobs) {
 		IOT_INFO("queuedJobs: %.*s", jobs->end - jobs->start, (char *)params->payload + jobs->start);
 	}
+	IOT_INFO("\n------------end--------------\n\n");
 }
 
+
+//$aws/things/MyThing/jobs/notify-next
 static void iot_next_job_callback_handler(AWS_IoT_Client *pClient, char *topicName, uint16_t topicNameLen,
 									IoT_Publish_Message_Params *params, void *pData) {
 	char topicToPublishUpdate[MAX_JOB_TOPIC_LENGTH_BYTES];
@@ -107,7 +126,7 @@ static void iot_next_job_callback_handler(AWS_IoT_Client *pClient, char *topicNa
 
 	IOT_UNUSED(pData);
 	IOT_UNUSED(pClient);
-	IOT_INFO("\nJOB_NOTIFY_NEXT_TOPIC / JOB_DESCRIBE_TOPIC($next) callback");
+	IOT_INFO("\n------------------start-2---------------");
 	IOT_INFO("topic: %.*s", topicNameLen, topicName);
 	IOT_INFO("payload: %.*s", (int) params->payloadLen, (char *)params->payload);
 
@@ -128,20 +147,31 @@ static void iot_next_job_callback_handler(AWS_IoT_Client *pClient, char *topicNa
 
 	jsmntok_t *tokExecution;
 
+
+	//查找执行中的作业
 	tokExecution = findToken("execution", params->payload, jsonTokenStruct);
 
+
+
 	if (tokExecution) {
+
+		//打印出执行的内容
 		IOT_INFO("execution: %.*s", tokExecution->end - tokExecution->start, (char *)params->payload + tokExecution->start);
 
 		jsmntok_t *tok;
 
+
+		//从执行作业查找 JobId
 		tok = findToken("jobId", params->payload, tokExecution);
+
 
 		if (tok) {
 			IoT_Error_t rc;
 			char jobId[MAX_SIZE_OF_JOB_ID + 1];
 			AwsIotJobExecutionUpdateRequest updateRequest;
 
+
+			//获取jobs id 值
 			rc = parseStringValue(jobId, MAX_SIZE_OF_JOB_ID + 1, params->payload, tok);
 			if(SUCCESS != rc) {
 				IOT_ERROR("parseStringValue returned error : %d ", rc);
@@ -150,6 +180,8 @@ static void iot_next_job_callback_handler(AWS_IoT_Client *pClient, char *topicNa
 
 			IOT_INFO("jobId: %s", jobId);
 
+
+			//查找作业文档
 			tok = findToken("jobDocument", params->payload, tokExecution);
 
 			/*
@@ -159,6 +191,7 @@ static void iot_next_job_callback_handler(AWS_IoT_Client *pClient, char *topicNa
 			if (tok) {
 				IOT_INFO("jobDocument: %.*s", tok->end - tok->start, (char *)params->payload + tok->start);
 				/* Alternatively if the job still has more steps the status can be set to JOB_EXECUTION_IN_PROGRESS instead */
+				//标记作业完成，应该在此处加入要操作的内容,操作成功后标记完成，否则失败
 				updateRequest.status = JOB_EXECUTION_SUCCEEDED;
 				updateRequest.statusDetails = "{\"exampleDetail\":\"a value appropriate for your successful job\"}";
 			} else {
@@ -182,28 +215,37 @@ static void iot_next_job_callback_handler(AWS_IoT_Client *pClient, char *topicNa
 	} else {
 		IOT_INFO("execution property not found, nothing to do");
 	}
+	IOT_INFO("\n------------------end----------------\n\n\n");
 }
 
+
+//操作被接收回调
 static void iot_update_accepted_callback_handler(AWS_IoT_Client *pClient, char *topicName, uint16_t topicNameLen,
 									IoT_Publish_Message_Params *params, void *pData) {
 	IOT_UNUSED(pData);
 	IOT_UNUSED(pClient);
-	IOT_INFO("\nJOB_UPDATE_TOPIC / accepted callback");
+	IOT_INFO("\n------------------start-3---------------");
 	IOT_INFO("topic: %.*s", topicNameLen, topicName);
 	IOT_INFO("payload: %.*s", (int) params->payloadLen, (char *)params->payload);
+	IOT_INFO("\n------------------end----------------\n\n\n");
 }
 
+
+//操作被拒绝回调
 static void iot_update_rejected_callback_handler(AWS_IoT_Client *pClient, char *topicName, uint16_t topicNameLen,
 									IoT_Publish_Message_Params *params, void *pData) {
 	IOT_UNUSED(pData);
 	IOT_UNUSED(pClient);
-	IOT_INFO("\nJOB_UPDATE_TOPIC / rejected callback");
+	IOT_INFO("\n------------------start-4---------------");
 	IOT_INFO("topic: %.*s", topicNameLen, topicName);
 	IOT_INFO("payload: %.*s", (int) params->payloadLen, (char *)params->payload);
-
+	IOT_INFO("\n------------------end----------------\n\n\n");
 	/* Do error handling here for when the update was rejected */
 }
 
+
+
+//mqtt断开回调
 static void disconnectCallbackHandler(AWS_IoT_Client *pClient, void *data) {
 	IOT_WARN("MQTT Disconnect");
 	IoT_Error_t rc = FAILURE;
@@ -213,7 +255,7 @@ static void disconnectCallbackHandler(AWS_IoT_Client *pClient, void *data) {
 	}
 
 	IOT_UNUSED(data);
-
+	IOT_INFO("\n------------------start-5---------------");
 	if(aws_iot_is_autoreconnect_enabled(pClient)) {
 		IOT_INFO("Auto Reconnect is enabled, Reconnecting attempt will start now");
 	} else {
@@ -225,6 +267,7 @@ static void disconnectCallbackHandler(AWS_IoT_Client *pClient, void *data) {
 			IOT_WARN("Manual Reconnect Failed - %d", rc);
 		}
 	}
+	IOT_INFO("\n------------------end----------------\n\n\n");
 }
 
 int main(int argc, char **argv) {
@@ -235,6 +278,8 @@ int main(int argc, char **argv) {
 	char cPayload[100];
 
 	IoT_Error_t rc = FAILURE;
+
+	printf("--------------------------------hello-----------------------------------\n");
 
 	AWS_IoT_Client client;
 	IoT_Client_Init_Params mqttInitParams = iotClientInitParamsDefault;
@@ -292,6 +337,13 @@ int main(int argc, char **argv) {
 		IOT_ERROR("Unable to set Auto Reconnect to true - %d", rc);
 		return rc;
 	}
+
+//-------------------------------------------------------------------------------------------------------------------
+//									以上为MQTT连接代码
+//-------------------------------------------------------------------------------------------------------------------
+
+
+
 
 	char topicToSubscribeGetPending[MAX_JOB_TOPIC_LENGTH_BYTES];
 	char topicToSubscribeNotifyNext[MAX_JOB_TOPIC_LENGTH_BYTES];

@@ -40,6 +40,7 @@ extern "C" {
  *
  * Macro to expose function, line number as well as desired log message.
  */
+#define ENABLE_IOT_DEBUG
 #ifdef ENABLE_IOT_DEBUG
 #define IOT_DEBUG(...)    \
 	{\

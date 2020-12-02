@@ -192,14 +192,20 @@ IoT_Error_t parseBooleanValue(bool *b, const char *jsonString, jsmntok_t *token)
 	return SUCCESS;
 }
 
+
+//获取Jobs id 值
 IoT_Error_t parseStringValue(char *buf, size_t bufLen, const char *jsonString, jsmntok_t *token) {
 	/* This length does not include a null-terminator. */
 	size_t stringLength = (size_t)(token->end - token->start);
 
+
+	//值类型是字符串
 	if(token->type != JSMN_STRING) {
 		IOT_WARN("Token was not a string.");
 		return JSON_PARSE_ERROR;
 	}
+
+
 
 	if (stringLength+1 > bufLen) {
 		IOT_WARN("Buffer too small to hold string value.");
@@ -212,14 +218,18 @@ IoT_Error_t parseStringValue(char *buf, size_t bufLen, const char *jsonString, j
 	return SUCCESS;
 }
 
+
+//从负载中找键值，
 jsmntok_t *findToken(const char *key, const char *jsonString, jsmntok_t *token) {
 	jsmntok_t *result = token;
 	int i;
 
+	//必须从对象中找键值
 	if(token->type != JSMN_OBJECT) {
 		IOT_WARN("Token was not an object.");
 		return NULL;
 	}
+
 
 	if(token->size == 0) {
 		return NULL;

@@ -38,28 +38,49 @@ extern "C" {
 
 /**
  * The type of job topic.
+ * 8个主题，
+ * 
+ * 
+ * 
  */
 typedef enum {
+
 	JOB_UNRECOGNIZED_TOPIC = 0,
+
 	JOB_GET_PENDING_TOPIC,
+
 	JOB_START_NEXT_TOPIC,
+
 	JOB_DESCRIBE_TOPIC,
+
 	JOB_UPDATE_TOPIC,
+
 	JOB_NOTIFY_TOPIC,
+
 	JOB_NOTIFY_NEXT_TOPIC,
+
 	JOB_WILDCARD_TOPIC
+	
 } AwsIotJobExecutionTopicType;
 
 /**
  * The type of reply topic, or #JOB_REQUEST_TYPE for
  * topics that are not replies.
+ * 5个回复类型
+ * 
  */
 typedef enum {
+
 	JOB_UNRECOGNIZED_TOPIC_TYPE = 0,
+
 	JOB_REQUEST_TYPE,
+
 	JOB_ACCEPTED_REPLY_TYPE,
+
 	JOB_REJECTED_REPLY_TYPE,
+
 	JOB_WILDCARD_REPLY_TYPE
+
 } AwsIotJobExecutionTopicReplyType;
 
 /**

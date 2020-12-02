@@ -30,20 +30,26 @@ extern "C" {
 	}
 
 
+
+/*10个参数
+ * 
+ * 
+ */
 IoT_Error_t aws_iot_jobs_subscribe_to_job_messages(
-		AWS_IoT_Client *pClient, QoS qos,
-		const char *thingName,
-		const char *jobId,
-		AwsIotJobExecutionTopicType topicType,
-		AwsIotJobExecutionTopicReplyType replyType,
-		pApplicationHandler_t pApplicationHandler,
-		void *pApplicationHandlerData,
-		char *topicBuffer,
-		uint16_t topicBufferSize)
+		AWS_IoT_Client *pClient, QoS qos,		//ok
+		const char *thingName,					//ok
+		const char *jobId,						//ok
+		AwsIotJobExecutionTopicType topicType,	//8种
+		AwsIotJobExecutionTopicReplyType replyType, //5种
+		pApplicationHandler_t pApplicationHandler,	//回调接口
+		void *pApplicationHandlerData,				//c传入回调的数据
+		char *topicBuffer,							//要订阅的主题
+		uint16_t topicBufferSize)					//订阅的主题长度
 {
 	int requiredSize = aws_iot_jobs_get_api_topic(topicBuffer, topicBufferSize, topicType, replyType, thingName, jobId);
 	CHECK_GENERATE_STRING_RESULT(requiredSize, topicBufferSize);
 
+	printf("订阅:--->%.*s\n",strlen(topicBuffer),topicBuffer);
 	return aws_iot_mqtt_subscribe(pClient, topicBuffer, (uint16_t)strlen(topicBuffer), qos, pApplicationHandler, pApplicationHandlerData);
 }
 
@@ -103,6 +109,7 @@ IoT_Error_t aws_iot_jobs_send_query(
 	publishParams.id = 0;
 	publishParams.payload = messageBuffer;
 	publishParams.payloadLen = messageLength;
+
 
 	return aws_iot_mqtt_publish(pClient, topicBuffer, topicSize, &publishParams);
 }
@@ -178,6 +185,8 @@ IoT_Error_t aws_iot_jobs_describe(
 	return aws_iot_mqtt_publish(pClient, topicBuffer, topicSize, &publishParams);
 }
 
+
+//更新作业状态
 IoT_Error_t aws_iot_jobs_send_update(
 		AWS_IoT_Client *pClient, QoS qos,
 		const char *thingName,
@@ -207,6 +216,9 @@ IoT_Error_t aws_iot_jobs_send_update(
 	publishParams.payload = messageBuffer;
 	publishParams.payloadLen = (size_t) serializeResult;
 
+
+
+	printf("更新作业状态：%.*s<<<<<<<<<<<<<<<<",topicSize,topicBuffer);
 	return aws_iot_mqtt_publish(pClient, topicBuffer, topicSize, &publishParams);
 }
 

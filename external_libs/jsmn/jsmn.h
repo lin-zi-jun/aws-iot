@@ -46,7 +46,7 @@ extern "C" {
  */
 typedef enum {
 	JSMN_UNDEFINED = 0,
-	JSMN_OBJECT = 1,
+	JSMN_OBJECT = 1,			//类型为对象
 	JSMN_ARRAY = 2,
 	JSMN_STRING = 3,
 	JSMN_PRIMITIVE = 4
@@ -68,10 +68,10 @@ enum jsmnerr {
  * end		end position in JSON data string
  */
 typedef struct {
-	jsmntype_t type;
-	int start;
-	int end;
-	int size;
+	jsmntype_t type;			//储存对象  负载类型
+	int start;					//指向负载头
+	int end;					//指向负载尾
+	int size;					
 #ifdef JSMN_PARENT_LINKS
 	int parent;
 #endif

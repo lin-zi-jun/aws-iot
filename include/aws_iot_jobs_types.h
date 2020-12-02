@@ -37,14 +37,16 @@
 extern "C" {
 #endif
 
+
+//7中状态
 typedef enum {
-	JOB_EXECUTION_STATUS_NOT_SET = 0,
-	JOB_EXECUTION_QUEUED,
-	JOB_EXECUTION_IN_PROGRESS,
-	JOB_EXECUTION_FAILED,
-	JOB_EXECUTION_SUCCEEDED,
-	JOB_EXECUTION_CANCELED,
-	JOB_EXECUTION_REJECTED,
+	JOB_EXECUTION_STATUS_NOT_SET = 0,		//没有设状态
+	JOB_EXECUTION_QUEUED,				//排队中
+	JOB_EXECUTION_IN_PROGRESS,			//正在执行
+	JOB_EXECUTION_FAILED,				//执行失败
+	JOB_EXECUTION_SUCCEEDED,			//执行成功
+	JOB_EXECUTION_CANCELED,				//取消
+	JOB_EXECUTION_REJECTED,				//被拒绝
 	/***
 	 * Used for any status not in the supported list of statuses
 	 */
@@ -76,12 +78,12 @@ const char *aws_iot_jobs_map_status_to_string(JobExecutionStatus status);
  * A request to update the status of a job execution.
  */
 typedef struct {
-	int64_t expectedVersion;	// set to 0 to ignore
-	int64_t executionNumber;	// set to 0 to ignore
-	JobExecutionStatus status;
-	const char *statusDetails;
-	bool includeJobExecutionState;
-	bool includeJobDocument;
+	int64_t expectedVersion;	// set to 0 to ignore	版本		
+	int64_t executionNumber;	// set to 0 to ignore	序列号
+	JobExecutionStatus status;		//jobs 的状态
+	const char *statusDetails;		//服务说明
+	bool includeJobExecutionState;	//作业执行状态
+	bool includeJobDocument;		
 	const char *clientToken;
 } AwsIotJobExecutionUpdateRequest;
 

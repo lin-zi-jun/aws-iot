@@ -267,6 +267,9 @@ IoT_Error_t aws_iot_mqtt_publish(AWS_IoT_Client *pClient, const char *pTopicName
 		FUNC_EXIT_RC(rc);
 	}
 
+
+	printf("发布：------> %.*s\n",topicNameLen,pTopicName);
+	printf("发布内容：------> %.*s\n",pParams->payloadLen,pParams->payload);
 	pubRc = _aws_iot_mqtt_internal_publish(pClient, pTopicName, topicNameLen, pParams);
 
 	rc = aws_iot_mqtt_set_client_state(pClient, CLIENT_STATE_CONNECTED_PUBLISH_IN_PROGRESS, clientState);
