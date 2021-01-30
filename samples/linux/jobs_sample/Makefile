@@ -30,7 +30,7 @@ IOT_SRC_FILES += $(shell find $(PLATFORM_DIR)/ -name '*.c')
 IOT_SRC_FILES += $(shell find $(PLATFORM_COMMON_DIR)/ -name '*.c')
 
 #TLS - mbedtls
-MBEDTLS_DIR = $(IOT_CLIENT_DIR)/external_libs/mbedTLS
+MBEDTLS_DIR = /home/jordan/learn/mbedtls
 TLS_LIB_DIR = $(MBEDTLS_DIR)/library
 CRYPTO_LIB_DIR = $(MBEDTLS_DIR)/library
 TLS_INCLUDE_DIR = -I $(MBEDTLS_DIR)/include
