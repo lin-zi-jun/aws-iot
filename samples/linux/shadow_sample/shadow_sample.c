@@ -169,9 +169,6 @@ int main(int argc, char **argv) {
 
 	IOT_INFO("\nAWS IoT SDK Version %d.%d.%d-%s\n", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH, VERSION_TAG);
 
-	IOT_DEBUG("rootCA %s", rootCA);
-	IOT_DEBUG("clientCRT %s", clientCRT);
-	IOT_DEBUG("clientKey %s", clientKey);
 
 	parseInputArgsForConnectParams(argc, argv);
 
@@ -180,6 +177,10 @@ int main(int argc, char **argv) {
 	snprintf(rootCA, PATH_MAX + 1, "%s/%s/%s", CurrentWD, certDirectory, AWS_IOT_ROOT_CA_FILENAME);
 	snprintf(clientCRT, PATH_MAX + 1, "%s/%s/%s", CurrentWD, certDirectory, AWS_IOT_CERTIFICATE_FILENAME);
 	snprintf(clientKey, PATH_MAX + 1, "%s/%s/%s", CurrentWD, certDirectory, AWS_IOT_PRIVATE_KEY_FILENAME);
+
+	IOT_DEBUG("rootCA %s", rootCA);
+	IOT_DEBUG("clientCRT %s", clientCRT);
+	IOT_DEBUG("clientKey %s", clientKey);
 
 	// initialize the mqtt client
 	AWS_IoT_Client mqttClient;
@@ -205,13 +206,14 @@ int main(int argc, char **argv) {
 	scp.pMqttClientId = AWS_IOT_MQTT_CLIENT_ID;
 	scp.mqttClientIdLen = (uint16_t) strlen(AWS_IOT_MQTT_CLIENT_ID);
 
-	IOT_INFO("Shadow Connect");
+	IOT_INFO("Shadow Connecting 1");
 	rc = aws_iot_shadow_connect(&mqttClient, &scp);
 	if(SUCCESS != rc) {
 		IOT_ERROR("Shadow Connection Error");
 		return rc;
 	}
 
+	IOT_INFO("Shadow Connected 2");
 	/*
 	 * Enable Auto Reconnect functionality. Minimum and Maximum time of Exponential backoff are set in aws_iot_config.h
 	 *  #AWS_IOT_MQTT_MIN_RECONNECT_WAIT_INTERVAL
