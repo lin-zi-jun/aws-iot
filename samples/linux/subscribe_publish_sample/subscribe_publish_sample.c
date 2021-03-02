@@ -182,7 +182,12 @@ int main(int argc, char **argv) {
 	connectParams.MQTTVersion = MQTT_3_1_1;
 	connectParams.pClientID = AWS_IOT_MQTT_CLIENT_ID;
 	connectParams.clientIDLen = (uint16_t) strlen(AWS_IOT_MQTT_CLIENT_ID);
-	connectParams.isWillMsgPresent = false;
+	connectParams.isWillMsgPresent = true;  // This needs to be set to true so that server will continue parsing the packet and look for last will configuration
+	connectParams.will = iotMqttWillOptionsDefault; // This also configure the last will to be QoS0
+	connectParams.will.pTopicName = "AWSIOTLWTTEST";
+	connectParams.will.topicNameLen = strlen("AWSIOTLWTTEST");
+	connectParams.will.pMessage = "Jordan test  my  awsiot device last will message!";
+	connectParams.will.msgLen = strlen("Jordan test  my  awsiot device last will message!");
 
 	IOT_INFO("Connecting...");
 	rc = aws_iot_mqtt_connect(&client, &connectParams);
