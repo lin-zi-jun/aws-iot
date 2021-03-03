@@ -118,10 +118,16 @@ IoT_Error_t aws_iot_shadow_connect(AWS_IoT_Client *pClient, const ShadowConnectP
 	snprintf(myThingName, MAX_SIZE_OF_THING_NAME, "%s", pParams->pMyThingName);
 	snprintf(mqttClientID, MAX_SIZE_OF_UNIQUE_CLIENT_ID_BYTES, "%s", pParams->pMqttClientId);
 
-	ConnectParams.keepAliveIntervalInSec = 600; // NOTE: Temporary fix
+	ConnectParams.keepAliveIntervalInSec = 6; // NOTE: Temporary fix
 	ConnectParams.MQTTVersion = MQTT_3_1_1;
 	ConnectParams.isCleanSession = true;
-	ConnectParams.isWillMsgPresent = false;
+	ConnectParams.isWillMsgPresent = true;  // This needs to be set to true so that server will continue parsing the packet and look for last will configuration
+	ConnectParams.will = iotMqttWillOptionsDefault; // This also configure the last will to be QoS0
+	ConnectParams.will.pTopicName  = (char *)malloc(50+22);  //开辟一个空间存储消息
+  	sprintf(ConnectParams.will.pTopicName , "/things/%s/shadow/update", pParams->pMyThingName);
+  	ConnectParams.will.topicNameLen = strlen(ConnectParams.will.pTopicName);
+	ConnectParams.will.pMessage = "{\"state\": {\"reported\": {\"connected\": \"false\"}}}";
+	ConnectParams.will.msgLen = strlen("{\"state\": {\"reported\": {\"connected\": \"false\"}}}");
 	ConnectParams.pClientID = pParams->pMqttClientId;
 	ConnectParams.clientIDLen = pParams->mqttClientIdLen;
 	ConnectParams.pPassword = NULL;
